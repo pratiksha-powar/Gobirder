@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GoBirder</title>
+		<style>
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+		}
+		th, td {
+			padding: 3px;
+		}
+		th {
+			text-align: left;
+		}
+		table#t01 tr:nth-child(even) {
+			background-color: #eee;
+		}
+		table#t01 tr:nth-child(odd) {
+		   background-color: #fff;
+		}
+		table#t01 th {
+			background-color: black;
+			color: white;
+		}
+		caption {
+			text-align: center;
+			margin-bottom: 5px;
+			text-transform: uppercase;
+			font-size: 160%;
+			padding: 5px;
+			letter-spacing: 10px;
+			font-weight: bold;
+		}
+		table.center {
+			margin-left:auto; 
+			margin-right:auto;
+		}
+
+	</style>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script type="text/javascript">
+	$(document).ready(function()
+	{
+
+	});
+	</script>
+	<script>
+	var regionCodes = [];
+	var cityCodes = [];
+	function verify()
+	{
+	}
+
+		function selectCity(myCity)
+		{
+			console.log ("selectedCity["+myCity.selectedIndex+"]: "+myCity.options[myCity.selectedIndex].text + " : " + cityCodes[myCity.selectedIndex]);
+			document.getElementById('mapLoc').value = cityCodes[myCity.selectedIndex];
+		}
+
+		function populateCities(myRegion) {
+			//make HTTP request and populate another drop down
+			//console.log (myRegion.options[myRegion.selectedIndex].text);
+			//console.log (regionCodes[myRegion.selectedIndex]);
+			var sel = document.getElementById("cityDropDown");
+			sel.innerHTML = "";
+			var req = new XMLHttpRequest();
+			req.onreadystatechange = function() 
+			{
+				if (this.readyState == 4 && this.status == 200) 
+				{
+					var xmlData = req.responseXML;
+					//console.log (xmlData.querySelector("response").querySelector("result"));
+
+					//clear the cityCodes list
+					var len = cityCodes.length;
+					for (var i = 0; i < len; i++) 
+					{
+						cityCodes.pop();
+					}
+
+					x = xmlData.querySelector("response").querySelector("result").childNodes;
+					for (var k = 0; k < x.length; k++)
+					{
+						//console.log ("populateCities: "+x[k].childNodes[3].innerHTML);
+						option = document.createElement('option');
+						option.value= k;
+						cityCodes.push (x[k].childNodes[2].innerHTML);
+						option.innerHTML = x[k].childNodes[3].innerHTML; // whatever property it has
+						sel.appendChild(option);
+					}
+				}
+			};
+			req.open("GET", "https://ebird.org/ws1.1/ref/location/list?rtype=subnational2&fmt=xml&subnational1Code="+regionCodes[myRegion.selectedIndex], false);
+			req.send();
+		}
+		function handleMapLocClick(myRadio) {
+			//make HTTP request and populate drop down
+			var req = new XMLHttpRequest();
+			req.open("GET", "https://ebird.org/ws1.1/ref/location/list?rtype=subnational1&fmt=xml&countryCode=IN-KA", false); //looking up only Karnataka
+			req.send();
+			req.onreadystatechange = function() 
+			{
+				if (this.readyState == 4 && this.status == 200) 
+				{
+					var xmlData = req.responseXML;
+					x = xmlData.querySelector("response").querySelector("result").childNodes;
+					var sel = document.getElementById("locDropDown");
+					var len = regionCodes.length;
+					for (var i = 0; i < len; i++) 
+						regionCodes.pop();
+					var k;
+					for (k = 1; k < x.length; k++)
+					{
+						option = document.createElement('option');
+						option.value= k-1;
+						regionCodes.push (x[k].childNodes[1].innerHTML);
+						option.innerHTML = x[k].childNodes[2].innerHTML; // whatever property it has
+						sel.appendChild(option);
+					}
+				}
+			};	
+			
+		}
+		function handleCurrLocClick(myRadio) 
+		{
+			navigator.geolocation.getCurrentPosition(showPosition);
+		}
+		var lat;
+		var lng;
+		var latlng;
+		function showPosition(position) 
+		{
+			lat = position.coords.latitude;
+			lng = position.coords.longitude;
+			latlng = lat+","+lng;
+			console.log ("LatLng: "+latlng);
+			document.getElementById('curLoc').value = latlng;
+			document.getElementById('curLocTxt').value = latlng;
+		}
+		function myFunction(value) {
+			document.getElementById('dateVal').value = new Date().toISOString().substring(0, 10);
+			navigator.geolocation.getCurrentPosition(showPosition);
+		}
+	</script>
+</head>
+<body onload="myFunction()">
+  <form action="/search" method="POST" enctype="multipart/form-data">
+  
+  <table style="width:50%" id="t01" class="center">
+  <caption>GoBirder ===  Bird Search</caption>
+  
+ <tr>
+   <td>Size with Image</>
+   <td>
+		<input type="radio" style="vertical-align: middle" name="Size" value="1"> <label style="vertical-align: middle">Sparrow size or smaller </label><img src="./Media/Bird_Sizes/Purple-rumped Sunbird.jpg" style="vertical-align: middle" height="42" width="42"><br/>
+		<input type="radio" style="vertical-align: middle" name="Size" value="2"> <label style="vertical-align: middle">Between Sparrow and Myna</label><br/>
+		<input type="radio" style="vertical-align: middle" name="Size" value="3"> <label style="vertical-align: middle">Myna </label><img src="./Media/Bird_Sizes/Myna.jpg" style="vertical-align: middle" height="42" width="42"><br/>
+		<input type="radio" style="vertical-align: middle" name="Size" value="4"> <label style="vertical-align: middle">Between Myna and Crow</label><br/>
+		<input type="radio" style="vertical-align: middle" name="Size" value="5"> <label style="vertical-align: middle">Crow</label> <img src="./Media/Bird_Sizes/Crow.jpg" style="vertical-align: middle" height="42" width="42"><br/>
+		<input type="radio" style="vertical-align: middle" name="Size" value="6"> <label style="vertical-align: middle">Between Crow and Pelican</label><br/>
+		<input type="radio" style="vertical-align: middle" name="Size" value="7"> <label style="vertical-align: middle">Pelican or bigger </label><img src="./Media/Bird_Sizes/Pelican.jpg" style="vertical-align: middle" height="42" width="42"><br/>
+   </td>
+ </tr>
+  <tr>
+    <td>Behaviour</td>
+	<td><select name="Behaviour">
+		<option value="1">Human Habitation</option>
+		<option value="2">Swimming or Wading</option>
+		<option value="4">On the ground</option>
+		<option value="8">In trees or bushes</option>
+		<option value="16">On a fence or wire</option>
+		<option value="32">Souring or flying</option>
+	</select></td>
+  </tr>
+  
+  <tr>
+    <td>Plumage</td>
+	<td><select name="Plumage" multiple size="4" id="plumage">
+		<option value="1">BLACK</option>
+		<option value="2">GREY</option>
+		<option value="4">WHITE</option>
+		<option value="8">BUFF/BROWN</option>
+		<option value="16">RED/RUFOUS</option>
+		<option value="32">YELLOW</option>
+		<option value="64">OLIVE/GREEN</option>
+		<option value="128">BLUE</option>
+		<option value="256">ORANGE</option>
+	</select></td>
+  </tr>
+    
+	  <tr>
+    <td>Habitat</td>
+	<td><select name="Habitat" multiple size="4" id="plumage">
+		<option value="1">Mudflats, Mangroves, Tidal Creeks, Estuaries, Salt Pans</option>
+		<option value="2">Salt desert</option>
+		<option value="4">Oak and Coniferous forests</option>
+		<option value="4"> Dense Broadleaved forests</option>
+		<option value="4"> Wet Evergreen forests</option>
+		<option value="4"> Semi-evergreen and deciduous forests</option>
+		<option value="4"> Shola forests</option>
+		<option value="4"> Coconut or Palm trees</option>
+		<option value="">Rice Paddy</option>
+		<option value="">Mountain slopes,cliffs</option>
+		<option value="">Jheels, Riverine, Sandbank</option>
+		<option value="">Dried Scrub, thicket, Bush</option>
+		<option value="">Grasses, Sugarcane fields, Reeds</option>
+		<option value="">Bamboo, forest clearings</option>
+		<option value="">Gardens</option>
+		<option value="">Building niches, Underside of bridges, Man-made habitat</option>
+
+	</select></td>
+  </tr>
+  <tr>
+    <td>Location</td>
+	<td>
+	<input type="radio" id="curLoc" name="loc" value="curLoc" onclick="handleCurrLocClick(this);" checked>Current Location
+	
+	<input type="text" id="curLocTxt" value=""><br> 
+
+	<input type="radio" id="mapLoc" name="loc" value="mapLoc" onclick="handleMapLocClick(this);">Choose Region 
+
+
+	<select name="mapLocDropDown" id="locDropDown" onchange="populateCities(this);" onfocus="populateCities(this);"></select>
+	<select name="mapCityDropDown" id="cityDropDown" onchange="selectCity(this);" onfocus="selectCity(this);"></select><br>
+    </td>
+  </tr>
+
+  <tr>
+    <td>Date</td>
+	<td>
+	<input type="date" id="dateVal" name="date">Enter the date of Sighting<br>
+    </td>
+  </tr>
+
+  <tr>
+    <td align="center"  colspan="2" >
+		<button type="submit" onClick="verify()">Submit</button>
+		<button type="reset" value="Reset">Clear</button>
+	</td>
+  </tr>
+
+</table>
+</form>
+<pre id="log">
+</pre>
+</body>
+</html>

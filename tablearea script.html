@@ -1,0 +1,68 @@
+<script>
+var req = new XMLHttpRequest();
+	req.open('GET', document.location, false);
+	req.send(null);
+	var data = req.getResponseHeader("dbdata");
+	var rows = data.split ("#");
+	
+	
+	
+	
+	
+	var sciNames = [];
+	var commonNames = [];
+	var classification = [];
+	var behaviour = [];
+	var plumage = [];
+	var size = [];
+	var index = [];
+	var cols = rows[0].split (";");
+	for (var i = 0; i < rows.length ; i++ )
+	{
+		var fields = rows[i].split (";");
+		//console.log (fields);
+		commonNames[i] = fields[0];
+		sciNames[i] = fields[1];
+		classification[i] = fields[2];
+		behaviour[i] = fields[3];
+		plumage[i] = fields[4];
+		size[i] = fields[5];
+		index[i] = i + 1;
+	}
+	var header = new Array();
+	header.push (["S.No.", "Common Name", "Scientific Name", "Classification", "Behaviour", "Plumage", "Size"]);
+	function myFunction(value) 
+	{
+		var tablearea = document.getElementById("datatable");
+		//Add the data rows
+		for (var i = 0; i < rows.length + 1 ; i++ )
+		{
+			var tr = tablearea.insertRow(i);
+			if (i == 0)
+			{
+				for (var j = 0; j < cols.length + 1 ; j++ )
+				{
+					var cell = tr.insertCell(j);
+					cell.innerHTML = (header[0][j]).bold();
+					cell.bgColor = "black";
+					cell.style.color = "white";
+				}
+				continue;
+			}
+			var cellidx = tr.insertCell(0);
+			cellidx.innerHTML = i;
+			var cell0 = tr.insertCell(1);
+			cell0.innerHTML = commonNames[i-1];
+			var cell1 = tr.insertCell(2);
+			cell1.innerHTML = sciNames[i-1];
+			var cell2 = tr.insertCell(3);
+			cell2.innerHTML = classification[i-1];
+			var cell3 = tr.insertCell(4);
+			cell3.innerHTML = behaviour[i-1];
+			var cell4 = tr.insertCell(5);
+			cell4.innerHTML = plumage[i-1];
+			var cell5 = tr.insertCell(6);
+			cell5.innerHTML = size[i-1];
+		}
+	}
+	</script>

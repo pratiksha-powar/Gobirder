@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Browse Birds</title>
+		<style>
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+		}
+		th, td {
+			padding: 3px;
+		}
+		th {
+			text-align: left;
+		}
+		table#t01 tr:nth-child(even) {
+			background-color: #eee;
+		}
+		table#t01 tr:nth-child(odd) {
+		   background-color: #fff;
+		}
+		table#t01 th {
+			background-color: black;
+			color: white;
+		}
+		caption {
+			text-align: center;
+			margin-bottom: 5px;
+			text-transform: uppercase;
+			font-size: 160%;
+			padding: 5px;
+			letter-spacing: 10px;
+			font-weight: bold;
+		}
+		table.center {
+			margin-left:auto; 
+			margin-right:auto;
+		}
+	</style>
+	<style>
+	.alert {
+	  padding: 20px;
+	  background-color: #f44336; /* Red */
+	  color: white;
+	  margin-bottom: 15px;
+	}
+	
+	th, td {
+	    padding: 3px;
+	}
+	th {
+	    text-align: left;
+	}
+	table#t01 tr:nth-child(even) {
+		background-color: #eee;
+	}
+	table#t01 tr:nth-child(odd) {
+	   background-color: #fff;
+	}
+	table#t01 th {
+		background-color: black;
+		color: white;white
+	}
+	caption {
+		text-align: center;
+		margin-bottom: 5px;
+		text-transform: uppercase;
+		font-size: 160%;
+		padding: 5px;
+		letter-spacing: 10px;
+		font-weight: bold;
+	}
+	table.center {
+		margin-left:auto; 
+		margin-right:auto;
+	</style>
+
+
+
+<script>   	
+		function getClassifieds(){
+		
+		var xhttp = new XMLHttpRequest();
+        xhttp.open('GET', "/fetchBirdGroups", true); 
+    	xhttp.send();
+		
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+			var arr_classifieds = JSON.parse(this.responseText);
+				displaygroups(arr_classifieds);
+            }
+           };
+       	}
+				    		
+                
+			function displaygroups(arr_classifieds)	
+			{
+			
+			var out = "";
+			var i;
+			for(i = 0; i < arr_classifieds.length; i++) 
+			{
+			out += "<option value=" + "'" + arr_classifieds[i].Classification +"'" + ">" + arr_classifieds[i].Classification + "</option>";
+			}
+
+			document.getElementById("birdgroup").innerHTML = out;
+			
+		    }
+		
+		function getBirdsByClassification(){
+		
+	    var birdgroup = document.getElementById("birdgroup").value;
+		alert(birdgroup);
+		var xhtml = new XMLHttpRequest();
+        xhtml.open('GET', "/fetchBirdsbyGrp?birdgroup=" + "'" + birdgroup + "'", true); 
+    	xhtml.send();
+		
+				
+		xhtml.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+			var arr_birds = JSON.parse(this.responseText);
+				displayBirds(arr_birds);
+				}
+           };
+       	}	
+
+		function displayBirds()
+		{
+		 var out = "";
+		 var i;
+			for(i = 0; i < arr_birds.length; i++) 
+						{
+					     out += "<tr> <td> " + "'" + arr_birds[i].CommonName +"'" + "</td> </tr>";
+						}
+
+					    document.getElementById("birdList").innerHTML = out;
+		
+		}
+			
+</script>
+</head>
+<body onload="getClassifieds()">
+
+<form action="/" method="GET" enctype="application/x-www-form-urlencoded" >	
+	    
+				
+				 <table id = "maintable" style="width:50%" class="center">
+				 <tr>
+				    <th> Pick a bird group
+					</th>
+					<th colspan="2">
+						 <select id="birdgroup" name="birdgroup" >
+						 
+						</select>
+						<input type="button" onClick="getBirdsByClassification();"value ="Go"/> 
+					</th>
+				 </tr>	
+				 </table>
+				
+				<table id = "birdList" style="width:50%" class="center">
+					
+				</table>
+
+
+
+
+    
+</form>
+
+
+</body>
+</html>
